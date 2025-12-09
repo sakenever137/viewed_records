@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_users_view_form_profile_inherit" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr.res_users_view_form_profile"/>
+        <field name="arch" type="xml">
+            <page name="hr_settings" position="after">
+                <page name="viewed_history" string="Viewed Records History">
+                    <field name="viewed_history_ids">
+                        <list string="Viewed Records History" edit="false" create="false">
+                            <field name="record_name"/>
+                            <field name="create_date"/>
+                            <field name="record_url" widget="url" text="Open Record"/>
+                        </list>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.guid</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="10"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='users_setting_container']" position="inside">
+                <setting id="viewed_records_settings">
+                    <label for="limit_of_viewed_records_by_date" string="History storage limit in days"/>
+                    <field name="limit_of_viewed_records_by_date"/><br/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_viewed_history_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form_inherit"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'viewed_records'}</field>
+    </record>
+</odoo>

@@ -1,0 +1,13 @@
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_check_limit_date" model="ir.cron">
+            <field name="name">Deleting a record older than limit_of_viewed_records_by_date days</field>
+            <field name="model_id" ref="model_viewed_records_history"/>
+            <field name="state">code</field>
+            <field name="code">model._cleanup_old_records()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

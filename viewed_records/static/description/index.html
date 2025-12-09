@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Viewed Records for Odoo 17</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 40px auto;
+            color: #333;
+        }
+        h2, h3 {
+            color: #2c3e50;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        ul {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Viewed Records — Odoo 17 Module</h2>
+<div class="banner">
+    <img src="banner.gif" alt="Viewed Records Banner" style="max-width:1000px; width:100%; height:auto;">
+</div>
+<h3>Description</h3>
+<p>
+    <strong>Viewed Records</strong> is a module for tracking which records have been opened by users 
+    across all Odoo models.  
+    It automatically saves the history of viewed form records, allows checking whether the user has seen a record, 
+    and shows the "viewed" status directly on the form.
+</p>
+
+<h3>How It Works</h3>
+<p>
+    To enable tracking, the model must inherit the mixin 
+    <code>viewed.records.mixin</code>, and the form must use the widget <code>js_class="viewed_records"</code>.  
+    When a user opens a form view, the module automatically creates a record in 
+    <code>viewed.record.history</code> and updates the field <code>is_viewed</code>.
+</p>
+
+<h3>Models</h3>
+
+<h4>viewed.record.history</h4>
+<ul>
+    <li><strong>res_model</strong> — model name</li>
+    <li><strong>record_id</strong> — record ID</li>
+    <li><strong>user_id</strong> — user</li>
+    <li><strong>record_name</strong> — record display name</li>
+    <li><strong>record_url</strong> — direct form URL</li>
+</ul>
+
+<h4>viewed.records.mixin</h4>
+<p>Provides automatic tracking of viewed records.</p>
+<ul>
+    <li><strong>is_viewed</strong> — Boolean, computed field</li>
+</ul>
+
+<h3>JavaScript Widget</h3>
+<p>
+    The widget is enabled by adding <code>js_class="viewed_records"</code>  
+    and calls the method <code>mark_as_viewed()</code> upon form load.
+</p>
+
+<p>Example of using <code>js_class="viewed_records"</code> inside a form:</p>
+
+<pre><code>&lt;record id="view_task_form" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;project.task.form&lt;/field&gt;
+    &lt;field name="model"&gt;project.task&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;form js_class="viewed_records"&gt;
+            &lt;field name="name"/&gt;
+        &lt;/form&gt;
+    &lt;/field&gt;
+&lt;/record&gt;
+</code></pre>
+
+<h3>Python Mixin</h3>
+<p>
+    The mixin adds the computed field <code>is_viewed</code> and helper methods for tracking.
+</p>
+
+<pre><code>class ViewedRecordsMixin(models.AbstractModel):
+    _name = 'viewed.records.mixin'
+
+    is_viewed = fields.Boolean(string='Is Opened', compute='_compute_is_viewed')
+
+    @api.depends()
+    def _compute_is_viewed(self):
+        ViewedRecordsHistory = self.env['viewed.records.history']
+        for rec in self:
+            viewed = ViewedRecordsHistory.search([
+                ('res_model', '=', self._name),
+                ('record_id', '=', rec.id),
+                ('user_id', '=', self.env.user.id),
+            ], limit=1)
+            rec.is_viewed = bool(viewed)
+</code></pre>
+
+<h3>Using the Mixin in Your Model</h3>
+<p>
+    To enable this functionality on any model, simply add:
+</p>
+
+<pre><code>class ProjectTask(models.Model):
+    _name = 'project.task'
+    _inherit = ['project.task', 'viewed.records.mixin']
+</code></pre>
+
+<p>
+    After that, the model receives:
+</p>
+<ul>
+    <li>the field <code>is_viewed</code></li>
+    <li>automatic history tracking when opening the form</li>
+    <li>list view highlighting for unread records</li>
+</ul>
+
+<h3>List View Decoration — Highlight Unread Records</h3>
+<p>
+    The module supports visual highlighting of records that the user has <strong>not opened yet</strong>.
+</p>
+
+<p>Example highlighting unread records in a list:</p>
+
+<pre><code>&lt;record id="view_task_list" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;project.task.list&lt;/field&gt;
+    &lt;field name="model"&gt;project.task&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;list decoration-info="not is_viewed"&gt;
+            &lt;field name="name"/&gt;
+            &lt;field name="is_viewed" column_invisible="1"/&gt;
+        &lt;/list&gt;
+    &lt;/field&gt;
+&lt;/record&gt;
+</code></pre>
+
+<p>
+    • Rows where <code>is_viewed = False</code> will be highlighted using the "info" decoration.  
+    • This is useful for visually identifying unread tasks, tickets, leads, documents, etc.
+</p>
+
+<h3>Installation</h3>
+<p>Place the module into the <strong>addons/</strong> directory and install it from the Apps menu.</p>
+
+<h3>Contact</h3>
+<p>
+    Author: Saken Serdaly <br>
+    Email: <a href="mailto:sakenever137@gmail.com">sakenever137@gmail.com</a> <br>
+    GitHub: <a href="https://github.com/sakenever137" target="_blank">github.com/sakenever137</a>
+</p>
+
+</body>
+</html>
